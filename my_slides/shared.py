@@ -102,6 +102,80 @@ def build_network(layer_sizes, h_spacing=2.2, v_spacing=1.0, colors=None, labels
     return neurons, edges, all_mobs
 
 
+def add_layer(
+    neurons,
+    edges,
+    net_group,
+    n=1,
+    color=C_OUTPUT,
+    h_spacing=2.2,
+    v_spacing=1.0,
+    labels=True,
+):
+    """
+    Append a layer of *n* neurons at the end of an existing network.
+
+    The new neurons and their incoming edges are appended to the
+    *neurons* list and *edges* dict in place.  The caller should
+    add the returned mobjects to *net_group* **after** animating
+    them in (to control when they appear on screen).
+
+    Parameters
+    ----------
+    neurons : list[list[Neuron]]
+    edges : dict[(int, int, int), Line]
+    net_group : VGroup  (not mutated by this function)
+    n : int  number of neurons in the new layer
+    color : str
+    h_spacing : float  horizontal distance from the previous layer
+    v_spacing : float  vertical spacing between neurons in this layer
+    labels : bool
+
+    Returns
+    -------
+    (new_neurons, new_edge_mobs)
+        new_neurons : list[Neuron]
+        new_edge_mobs : list[Line]
+    """
+    last_layer = neurons[-1]
+    l = len(neurons)  # index this new layer will have
+
+    # Position the new layer *h_spacing* to the right of the last layer,
+    # respecting any previous shifts / centering applied to the network.
+    last_x = np.mean([n.get_center()[0] for n in last_layer])
+    new_x = last_x + h_spacing
+
+    total_h = (n - 1) * v_spacing
+    new_neurons = []
+    for i in range(n):
+        prefix = _layer_prefix(l, l + 1)  # new total = l + 1
+        lbl = f"{prefix}_{{{i}}}" if labels else ""
+        neuron = Neuron(label=lbl, color=color)
+        neuron.move_to(np.array([new_x, total_h / 2 - i * v_spacing, 0]))
+        neuron.set_z_index(1)
+        new_neurons.append(neuron)
+        net_group.add(neuron)
+
+    # Edges from the previous last layer → new layer
+    src_idx = l - 1
+    new_edge_mobs = []
+    for i, src in enumerate(last_layer):
+        for j, dst in enumerate(new_neurons):
+            e = Line(
+                src.get_center(),
+                dst.get_center(),
+                stroke_color=C_ORANGE,
+                stroke_width=0.8,
+                stroke_opacity=0.2,
+            ).set_z(0)
+            edges[(src_idx, i, j)] = e
+            new_edge_mobs.append(e)
+            net_group.add(e)
+
+    neurons.append(new_neurons)
+    return new_neurons, new_edge_mobs
+
+
 def section_title(text, font_size=36):
     t = Text(text, font_size=font_size, slant=ITALIC)
     t.to_edge(UP, buff=0.5)
