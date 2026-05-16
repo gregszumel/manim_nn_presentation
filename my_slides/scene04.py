@@ -5,20 +5,20 @@ from my_slides.shared import *
 
 class Slide04Equations(Slide):
     def construct(self):
+        neurons, edges, net_group = build_network(
+            [3, 4], h_spacing=2.8, v_spacing=0.95, colors=[C_INPUT, C_HIDDEN]
+        )
+        [n.set_label(f"h_{i}") for (i, n) in enumerate(neurons[-1])]
+        net_group.shift(LEFT * 2.5)
+        self.add(
+            *[n for layer in neurons for n in layer],
+            *[e for e in edges.values()],
+        )
         self.next_slide()
 
         title = section_title("writing it out")
         self.play(FadeIn(title), run_time=0.5)
 
-        neurons, edges, net_group = build_network(
-            [3, 4], h_spacing=2.8, v_spacing=0.95, colors=[C_INPUT, C_HIDDEN]
-        )
-        net_group.shift(LEFT * 2.5)
-        self.play(
-            *[FadeIn(n) for layer in neurons for n in layer],
-            *[Create(e) for e in edges.values()],
-            run_time=0.8,
-        )
         self.next_slide()
 
         n_inputs = 3
@@ -121,10 +121,10 @@ class Slide04Equations(Slide):
 
         self.play(
             *[
-                TransformMatchingShapes(VGroup(lhs, *terms), row_f)
+                TransformMatchingTex(VGroup(lhs, *terms), row_f)
                 for row_f, lhs, terms in flipped
             ],
             run_time=0.8,
         )
         self.next_slide()
-        self.play(FadeOut(Group(*self.mobjects)))
+        self.play(FadeOut(title))

@@ -95,7 +95,7 @@ def build_network(layer_sizes, h_spacing=2.2, v_spacing=1.0, colors=None, labels
                     dst.get_center(),
                     stroke_color=C_ORANGE,
                     stroke_width=0.8,
-                    stroke_opacity=0.2,
+                    stroke_opacity=0.5,
                 ).set_z(0)
     all_mobs = VGroup(*[m for layer in neurons for m in layer], *edges.values())
     all_mobs.center()
@@ -166,7 +166,7 @@ def add_layer(
                 dst.get_center(),
                 stroke_color=C_ORANGE,
                 stroke_width=0.8,
-                stroke_opacity=0.2,
+                stroke_opacity=0.5,
             ).set_z(0)
             edges[(src_idx, i, j)] = e
             new_edge_mobs.append(e)

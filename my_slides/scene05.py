@@ -5,20 +5,18 @@ from my_slides.shared import *
 
 class Slide05MatrixMult(Slide):
     def construct(self):
-        self.next_slide()
-
-        title = section_title("this is just matrix multiplication")
-        self.play(FadeIn(title), run_time=0.5)
 
         # ── Network (same as slide 4 ending) ──────────────────────────────
         neurons, edges, net_group = build_network(
             [3, 4], h_spacing=2.8, v_spacing=0.95, colors=[C_INPUT, C_HIDDEN]
         )
+        # Layer 1 is the last layer so build_network labels it "o_j"; fix to "h_j"
+        for i, n in enumerate(neurons[1]):
+            n.set_label(f"h_{{{i}}}", color=C_HIDDEN)
         net_group.shift(LEFT * 2.8)
-        self.play(
-            *[FadeIn(n) for layer in neurons for n in layer],
-            *[Create(e) for e in edges.values()],
-            run_time=0.8,
+        self.add(
+            *[n for layer in neurons for n in layer],
+            *[e for e in edges.values()],
         )
 
         # ── Equations: i_0·w_{x0} + … = h_j (flipped form) ───────────────
@@ -56,7 +54,10 @@ class Slide05MatrixMult(Slide):
         )
         all_eq.next_to(net_group, RIGHT, buff=1.5)
 
-        self.play(FadeIn(all_eq), run_time=0.8)
+        self.add(all_eq)
+        title = section_title("this is just matrix multiplication")
+        self.play(FadeIn(title), run_time=0.5)
+
         self.next_slide()
 
         # ── Push up: fade network, center equations at top ─────────────────
@@ -196,78 +197,65 @@ class Slide05MatrixMult(Slide):
         self.next_slide()
 
         # ═══════════════════════════════════════════════════════════════════
-        # ── Pseudo matrix multiplication: highlight row × column ─────────
+        # ── Pseudo matrix multiplication: all 4 rows ─────────────────────
         # ═══════════════════════════════════════════════════════════════════
         hl = C_YELLOW
 
-        # Highlight row 0 of W and all i entries
-        self.play(
-            *[w_vis[0][x].animate.set_color(hl) for x in range(n_inputs)],
-            *[i_vis[x].animate.set_color(hl) for x in range(n_inputs)],
-            run_time=0.6,
-        )
-        self.next_slide()
+        for j in range(n_hidden):
+            # Highlight row j of W and all i entries
+            self.play(
+                *[w_vis[j][x].animate.set_color(hl) for x in range(n_inputs)],
+                *[i_vis[x].animate.set_color(hl) for x in range(n_inputs)],
+                run_time=0.4,
+            )
 
-        # Draw boxes around the active row / column
-        w_box = SurroundingRectangle(
-            VGroup(*w_vis[0]), color=hl, buff=0.1, stroke_width=2
-        )
-        i_box = SurroundingRectangle(VGroup(*i_vis), color=hl, buff=0.1, stroke_width=2)
+            w_box = SurroundingRectangle(
+                VGroup(*w_vis[j]), color=hl, buff=0.1, stroke_width=2
+            )
+            i_box = SurroundingRectangle(
+                VGroup(*i_vis), color=hl, buff=0.1, stroke_width=2
+            )
 
-        # Build the dot-product equation: w_{00}·i_0 + w_{10}·i_1 + w_{20}·i_2 = h_0
-        dot_terms = []
-        for x in range(n_inputs):
-            if x > 0:
-                dot_terms.append(MathTex(r"+", font_size=28, color=WHITE))
-            dot_terms.append(MathTex(f"w_{{{x}0}}", font_size=28, color=C_ORANGE))
-            dot_terms.append(MathTex(r"\cdot", font_size=28, color=WHITE))
-            dot_terms.append(MathTex(f"i_{{{x}}}", font_size=28, color=C_INPUT))
-        dot_terms.append(MathTex(r"=", font_size=28, color=WHITE))
-        dot_terms.append(MathTex(r"h_0", font_size=28, color=C_HIDDEN))
+            # Dot-product equation for this row
+            dot_terms = []
+            for x in range(n_inputs):
+                if x > 0:
+                    dot_terms.append(MathTex(r"+", font_size=26, color=WHITE))
+                dot_terms.append(MathTex(f"w_{{{x}{j}}}", font_size=26, color=C_ORANGE))
+                dot_terms.append(MathTex(r"\cdot", font_size=26, color=WHITE))
+                dot_terms.append(MathTex(f"i_{{{x}}}", font_size=26, color=C_INPUT))
+            dot_terms.append(MathTex(r"=", font_size=26, color=WHITE))
+            dot_terms.append(MathTex(f"h_{{{j}}}", font_size=26, color=C_HIDDEN))
+            dot_eq = VGroup(*dot_terms).arrange(RIGHT, buff=0.10)
+            dot_eq.next_to(mat_eq, DOWN, buff=0.7)
 
-        dot_eq = VGroup(*dot_terms).arrange(RIGHT, buff=0.12)
-        dot_eq.next_to(mat_eq, DOWN, buff=0.8)
+            hj_box = SurroundingRectangle(h_vis[j], color=hl, buff=0.1, stroke_width=2)
 
-        self.play(
-            Create(w_box),
-            Create(i_box),
-            FadeIn(dot_eq, shift=UP * 0.15),
-            run_time=0.7,
-        )
-        self.next_slide()
+            self.play(
+                Create(w_box),
+                Create(i_box),
+                FadeIn(dot_eq, shift=UP * 0.1),
+                run_time=0.5,
+            )
+            self.play(
+                Create(hj_box),
+                h_vis[j].animate.set_color(hl),
+                run_time=0.3,
+            )
+            self.next_slide()
 
-        # Step through each (w_{x0}, i_x) pair in the matrix
-        pair_labels = []
-        for x in range(n_inputs):
-            pair = MathTex(f"w_{{{x}0}} \\cdot i_{{{x}}}", font_size=22, color=hl)
-            pair.next_to(w_vis[0][x], UP, buff=0.3)
-            pair_labels.append(pair)
+            # Reset highlights
+            self.play(
+                FadeOut(w_box),
+                FadeOut(i_box),
+                FadeOut(hj_box),
+                FadeOut(dot_eq),
+                *[w_vis[j][x].animate.set_color(C_ORANGE) for x in range(n_inputs)],
+                *[i_vis[x].animate.set_color(C_INPUT) for x in range(n_inputs)],
+                h_vis[j].animate.set_color(C_HIDDEN),
+                run_time=0.4,
+            )
 
-        for x in range(n_inputs):
-            self.play(FadeIn(pair_labels[x], scale=0.5), run_time=0.3)
-            self.wait(0.15)
-
-        # Highlight the result h_0 in the h vector
-        h0_box = SurroundingRectangle(h_vis[0], color=hl, buff=0.1, stroke_width=2)
-        self.play(
-            Create(h0_box),
-            h_vis[0].animate.set_color(hl),
-            run_time=0.4,
-        )
-        self.next_slide()
-
-        # ── Clean up highlights (keep everything visible otherwise) ────────
-        self.play(
-            *[FadeOut(p) for p in pair_labels],
-            FadeOut(w_box),
-            FadeOut(i_box),
-            FadeOut(h0_box),
-            *[w_vis[0][x].animate.set_color(C_ORANGE) for x in range(n_inputs)],
-            *[i_vis[x].animate.set_color(C_INPUT) for x in range(n_inputs)],
-            h_vis[0].animate.set_color(C_HIDDEN),
-            FadeOut(dot_eq),
-            run_time=0.6,
-        )
         self.next_slide()
 
         # ═══════════════════════════════════════════════════════════════════

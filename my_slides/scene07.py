@@ -44,7 +44,9 @@ class Slide07Activations(Slide):
         relu = axes.plot(
             lambda x: max(0.0, x), x_range=[-2, 2], color=C_ORANGE, stroke_width=3
         )
-        relu_label = Text("negative → 0     positive → unchanged", font_size=20, color=C_ORANGE)
+        relu_label = Text(
+            "negative → 0     positive → unchanged", font_size=20, color=C_ORANGE
+        )
         relu_label.next_to(axes, DOWN, buff=0.25)
 
         self.play(Create(axes), FadeIn(x_lbl), FadeIn(y_lbl), run_time=0.6)
@@ -91,11 +93,13 @@ class Slide07Activations(Slide):
             lbl.next_to(neurons[1][j], UP, buff=0.12)
             inter_labels.add(lbl)
 
+        inter_labels.set_z_index(5)
         self.play(FadeIn(inter_labels, shift=DOWN * 0.1), run_time=0.5)
 
         relu_hint = Text(
             "ReLU: negatives → 0, positives stay",
-            font_size=22, color=C_ORANGE,
+            font_size=22,
+            color=C_ORANGE,
         )
         relu_hint.next_to(net_group, DOWN, buff=0.6)
         self.play(FadeIn(relu_hint, shift=UP * 0.1), run_time=0.5)
@@ -103,8 +107,11 @@ class Slide07Activations(Slide):
 
         # Highlight the hidden layer
         hidden_highlight = SurroundingRectangle(
-            VGroup(*neurons[1]), color=C_YELLOW, buff=0.2, corner_radius=0.1
-        )
+            VGroup(*neurons[1], *inter_labels),
+            color=C_YELLOW,
+            buff=0.2,
+            corner_radius=0.1,
+        ).set_z_index(2)
         self.play(Create(hidden_highlight), run_time=0.4)
         self.next_slide()
 
@@ -150,7 +157,12 @@ class Slide07Activations(Slide):
         # ═══════════════════════════════════════════════════════════════════
         # Removed the .shift(UP * 0.6) — equations now anchor properly
         eq_h = MathTex(
-            r"\mathbf{h}", "=", r"\sigma(", r"\mathbf{W}_1", r"\mathbf{i}", ")",
+            r"\mathbf{h}",
+            "=",
+            r"\sigma(",
+            r"\mathbf{W}_1",
+            r"\mathbf{i}",
+            ")",
             font_size=34,
         )
         eq_h[0].set_color(C_HIDDEN)
@@ -162,7 +174,14 @@ class Slide07Activations(Slide):
         self.next_slide()
 
         eq_o = MathTex(
-            r"\mathbf{o}", "=", r"\mathbf{W}_2", r"\,", r"\sigma(", r"\mathbf{W}_1", r"\mathbf{i}", ")",
+            r"\mathbf{o}",
+            "=",
+            r"\mathbf{W}_2",
+            r"\,",
+            r"\sigma(",
+            r"\mathbf{W}_1",
+            r"\mathbf{i}",
+            ")",
             font_size=34,
         )
         eq_o[0].set_color(C_OUTPUT)
@@ -179,12 +198,15 @@ class Slide07Activations(Slide):
         # ═══════════════════════════════════════════════════════════════════
         explain = Text(
             "σ is nonlinear — it cannot be moved past the matrix",
-            font_size=24, color=C_YELLOW,
+            font_size=24,
+            color=C_YELLOW,
         )
         explain.next_to(eq_o, DOWN, buff=0.6, aligned_edge=LEFT)
 
         attempt = MathTex(
-            r"\sigma(\mathbf{W}_1 \mathbf{i})", r"\;\neq\;", r"\mathbf{W}_1 \sigma(\mathbf{i})",
+            r"\sigma(\mathbf{W}_1 \mathbf{i})",
+            r"\;\neq\;",
+            r"\mathbf{W}_1 \sigma(\mathbf{i})",
             font_size=34,
         )
         attempt[0].set_color(C_RED)
@@ -195,7 +217,9 @@ class Slide07Activations(Slide):
         self.play(FadeIn(attempt, shift=UP * 0.1), run_time=0.6)
         self.next_slide()
 
-        distinct = Text("layers stay fundamentally distinct", font_size=22, color=C_GREEN)
+        distinct = Text(
+            "layers stay fundamentally distinct", font_size=22, color=C_GREEN
+        )
         distinct.next_to(attempt, DOWN, buff=0.3, aligned_edge=LEFT)
         self.play(FadeIn(distinct, shift=UP * 0.1), run_time=0.5)
         self.next_slide()
@@ -210,18 +234,24 @@ class Slide07Activations(Slide):
 
         no_sigma_eq = MathTex(
             r"\mathbf{o} = (\mathbf{W}_2 \mathbf{W}_1) \mathbf{i}",
-            font_size=28, color=C_RED,
+            font_size=28,
+            color=C_RED,
         )
         yes_sigma_eq = MathTex(
             r"\mathbf{o} = \mathbf{W}_2 \,\sigma(\mathbf{W}_1 \mathbf{i})",
-            font_size=28, color=C_GREEN,
+            font_size=28,
+            color=C_GREEN,
         )
 
         no_sigma_lbl = Text("without σ:  collapse", font_size=20, color=C_RED)
         yes_sigma_lbl = Text("with σ:  no collapse", font_size=20, color=C_GREEN)
 
-        no_group = VGroup(no_sigma_lbl, no_sigma_eq).arrange(DOWN, buff=0.15, aligned_edge=LEFT)
-        yes_group = VGroup(yes_sigma_lbl, yes_sigma_eq).arrange(DOWN, buff=0.15, aligned_edge=LEFT)
+        no_group = VGroup(no_sigma_lbl, no_sigma_eq).arrange(
+            DOWN, buff=0.15, aligned_edge=LEFT
+        )
+        yes_group = VGroup(yes_sigma_lbl, yes_sigma_eq).arrange(
+            DOWN, buff=0.15, aligned_edge=LEFT
+        )
 
         summary = VGroup(no_group, yes_group).arrange(RIGHT, buff=1.2)
         summary.to_edge(DOWN, buff=0.6)
@@ -231,10 +261,13 @@ class Slide07Activations(Slide):
 
         # ── 8. Punchline ─────────────────────────────────────────────────
         punchline = Text(
-            "non-linearities = representational power", font_size=28, color=C_YELLOW,
+            "non-linearities = representational power",
+            font_size=28,
+            color=C_YELLOW,
         )
         punchline.next_to(summary, UP, buff=0.3)
         self.play(FadeIn(punchline, shift=UP * 0.1), run_time=0.5)
         self.next_slide()
 
         self.play(FadeOut(Group(*self.mobjects)))
+

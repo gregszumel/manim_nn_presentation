@@ -82,18 +82,28 @@ def build_training_view(scene, ax_shift_left=3.2, net_shift_right=3.2):
             return DOWN * magnitude
         return UP * magnitude  # center → arbitrary, default up
 
-    # W1 edge labels (fixed, grey) — input → hidden weights
-    # Anchored 70% along the edge so they cluster near the (spread-out) hidden
-    # neurons rather than the single input neuron.  Offset perpendicular to
-    # the input neuron's y-line so top-half labels go UP, bottom-half go DOWN.
+    # W1 edge labels — show the FULL pre-activation linear function on each
+    # edge: "x - 0.5", "-x - 1.0", etc.  Each hidden neuron has both a weight
+    # W1[j] AND a bias B1[j], and the neuron value is relu(W1[j]·x + B1[j]).
+    # Showing only W1 hid the bias and made the neuron's value look "wrong"
+    # (a fraction even though the weight is ±1) — this fixes that.
+    def _pre_act_expr(w, b):
+        if w == 1.0:
+            w_str = "x"
+        elif w == -1.0:
+            w_str = "-x"
+        else:
+            w_str = f"{w:+.0f}x"
+        return w_str + f"{b:+.1f}"
+
     input_y = neurons[0][0].get_center()[1]
     w1_lbls = []
     for j in range(N_HIDDEN):
         e = edges[(0, 0, j)]
-        anchor = 0.3 * e.get_start() + 0.7 * e.get_end()
-        offset = _outward_offset(anchor[1], input_y, 0.10)
-        lbl = Text(f"{W1[j]:+.0f}", font_size=10, color=C_GREY)
-        lbl.move_to(anchor + offset)
+        anchor = 0.5 * e.get_start() + 0.5 * e.get_end()
+        offset = _outward_offset(anchor[1], input_y, 0.16)
+        lbl = MathTex(_pre_act_expr(W1[j], B1[j]), font_size=14, color=C_INPUT)
+        lbl.move_to(anchor)
         lbl.set_z_index(11)
         w1_lbls.append(lbl)
 

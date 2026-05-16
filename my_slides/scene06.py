@@ -14,6 +14,9 @@ class Slide06TwoLayers(Slide):
         neurons, edges, net_group = build_network(
             [3, 4], h_spacing=2.8, v_spacing=0.95, colors=[C_INPUT, C_HIDDEN]
         )
+        # Layer 1 is the last layer so build_network labels it "o_j"; fix to "h_j"
+        for i, n in enumerate(neurons[1]):
+            n.set_label(f"h_{{{i}}}", color=C_HIDDEN)
         net_group.shift(LEFT * 3.8)
 
         self.play(
@@ -42,10 +45,10 @@ class Slide06TwoLayers(Slide):
         new_title = section_title("still just linear...")
         self.play(Transform(title, new_title), run_time=0.4)
 
-        # ── Equation: h = W i ─────────────────────────────────────────────
-        eq_h = MathTex(r"\mathbf{h}", "=", r"\mathbf{W}", r"\mathbf{i}", font_size=34)
+        # ── Equation: h = W₁ i ────────────────────────────────────────────
+        eq_h = MathTex(r"\mathbf{h}", "=", r"\mathbf{W}_1", r"\mathbf{i}", font_size=34)
         eq_h[0].set_color(C_HIDDEN)
-        eq_h[2].set_color(C_ORANGE)
+        eq_h[2].set_color(C_HIDDEN)  # W1 in hidden (green)
         eq_h[3].set_color(C_INPUT)
         eq_h.next_to(net_group, RIGHT, buff=1.8).shift(UP * 1.0)
 
@@ -93,13 +96,13 @@ class Slide06TwoLayers(Slide):
             r"\mathbf{h}", "=", r"\mathbf{W}_1", r"\mathbf{i}", font_size=34
         )
         eq_h1[0].set_color(C_HIDDEN)
-        eq_h1[2].set_color(C_ORANGE)
+        eq_h1[2].set_color(C_HIDDEN)  # W1 green
         eq_h1[3].set_color(C_INPUT)
         eq_h1.next_to(eq_o, UP, buff=0.5, aligned_edge=LEFT)
 
         self.play(
             *[n.animate.set_opacity(1) for n in in_hid_neurons],
-            *[e.animate.set_stroke(opacity=0.2) for e in in_hid_edges],
+            *[e.animate.set_stroke(opacity=0.5) for e in in_hid_edges],
             FadeIn(eq_h1),
             run_time=0.6,
         )
@@ -174,8 +177,8 @@ class Slide06TwoLayers(Slide):
 
         # Annotate W* below the product
         paren_group = VGroup(eq_collapse[3], eq_collapse[4])
-        brace = Brace(paren_group, DOWN, color=C_RED, buff=0.05)
-        w_star = MathTex(r"\mathbf{W}^*", font_size=32, color=C_RED)
+        brace = Brace(paren_group, DOWN, color=C_YELLOW, buff=0.05)
+        w_star = MathTex(r"\mathbf{W}^*", font_size=32, color=C_YELLOW)
         w_star.next_to(brace, DOWN, buff=0.1)
 
         self.play(
@@ -246,7 +249,7 @@ class Slide06TwoLayers(Slide):
         # ── Build W₂ (1 × 4), W₁ (4 × 3), W* (1 × 3) ────────────────────
         w2_grid = [
             [
-                MathTex(f"w_{{{j}}}", font_size=20, color=C_ORANGE)
+                MathTex(f"w_{{{j}}}", font_size=20, color=C_OUTPUT)
                 for j in range(n_hidden)
             ]
         ]
@@ -254,7 +257,7 @@ class Slide06TwoLayers(Slide):
 
         w1_grid = [
             [
-                MathTex(f"w_{{{x}{j}}}", font_size=20, color=C_ORANGE)
+                MathTex(f"w_{{{x}{j}}}", font_size=20, color=C_HIDDEN)
                 for x in range(n_inputs)
             ]
             for j in range(n_hidden)
@@ -263,7 +266,7 @@ class Slide06TwoLayers(Slide):
 
         w_star_grid = [
             [
-                MathTex(f"w^*_{{{x}}}", font_size=20, color=C_RED)
+                MathTex(f"w^*_{{{x}}}", font_size=20, color=C_YELLOW)
                 for x in range(n_inputs)
             ]
         ]
@@ -316,7 +319,9 @@ class Slide06TwoLayers(Slide):
                 FadeOut(wstar_col_hl),
                 FadeOut(w2_row_hl),
                 FadeOut(w1_col_hl),
-                w_star_grid[0][x].animate.set_color(C_RED),
+                w_star_grid[0][x].animate.set_color(C_YELLOW),
+                *[w2_grid[0][jj].animate.set_color(C_OUTPUT) for jj in range(n_hidden)],
+                *[w1_grid[j][x].animate.set_color(C_HIDDEN) for j in range(n_hidden)],
                 run_time=0.3,
             )
 
@@ -330,9 +335,9 @@ class Slide06TwoLayers(Slide):
             r"\mathbf{W}^*",
             font_size=34,
         )
-        eq_final[0].set_color(C_ORANGE)
-        eq_final[1].set_color(C_ORANGE)
-        eq_final[3].set_color(C_RED)
+        eq_final[0].set_color(C_OUTPUT)
+        eq_final[1].set_color(C_HIDDEN)
+        eq_final[3].set_color(C_YELLOW)
         eq_final.to_corner(DR, buff=1.5)
 
         self.next_slide()
@@ -376,7 +381,7 @@ def collapse_edge_visual(self, edges, neurons, simp_edges, i_idx):
                 bottom_edge.copy().set_stroke(
                     color=C_YELLOW,
                     width=2.5,
-                    opacity=0.6,
+                    opacity=0.5,
                 )
             )
             for e in edge_copies
@@ -395,7 +400,7 @@ def collapse_edge_visual(self, edges, neurons, simp_edges, i_idx):
     # Fade top edges back to normal
     self.play(
         *[
-            e.animate.set_stroke(color=c, width=0.8, opacity=0.2)
+            e.animate.set_stroke(color=c, width=0.8, opacity=0.5)
             for e, c in zip(i0_edges, i0_orig_colors)
         ],
         run_time=0.5,

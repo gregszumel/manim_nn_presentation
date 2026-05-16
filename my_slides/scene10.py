@@ -73,7 +73,19 @@ class Slide10RealWorld(Slide):
         cat_grid = make_pixel_grid(cat_colors, [GRID_X, ROW1_Y, 0])
         cat_lbl  = Text("cat image", font_size=16, color=C_GREY).next_to(cat_grid, DOWN, buff=0.12)
 
-        self.play(FadeIn(cat_grid), FadeIn(cat_lbl), run_time=0.5)
+        # Show the real cat photo first, then pixelate into the colour grid
+        cat_photo = ImageMobject("assets/cat1.jpeg")
+        cat_photo.height = cat_grid.height * 1.6
+        cat_photo.move_to([GRID_X, ROW1_Y, 0])
+        self.play(FadeIn(cat_photo, scale=0.85), run_time=0.5)
+        self.next_slide()
+
+        self.play(
+            FadeOut(cat_photo),
+            FadeIn(cat_grid),
+            FadeIn(cat_lbl),
+            run_time=0.6,
+        )
         self.next_slide()
 
         # Each pixel flies from grid position to its slot in the vertical column
@@ -105,7 +117,20 @@ class Slide10RealWorld(Slide):
         out_notcat = Text('"not cat"', font_size=22, color=C_RED).next_to(net1, RIGHT, buff=0.3)
 
         self.play(FadeOut(out_cat), FadeOut(cat_col), FadeOut(arr1), run_time=0.3)
-        self.play(FadeIn(dog_grid), FadeIn(dog_lbl), run_time=0.4)
+
+        # Show real dog photo, then pixelate
+        dog_photo = ImageMobject("assets/dog.jpg")
+        dog_photo.height = dog_grid.height * 1.6
+        dog_photo.move_to([GRID_X, ROW1_Y, 0])
+        self.play(FadeIn(dog_photo, scale=0.85), run_time=0.4)
+        self.next_slide()
+
+        self.play(
+            FadeOut(dog_photo),
+            FadeIn(dog_grid),
+            FadeIn(dog_lbl),
+            run_time=0.5,
+        )
         self.next_slide()
 
         self.play(

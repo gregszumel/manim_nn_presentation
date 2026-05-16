@@ -121,9 +121,7 @@ class Slide02BasicNetwork(Slide):
         o_y1 = o1_pos[1]  # ~-0.75
 
         # Fade out old h₁→output edges
-        old_h1_out_edges = VGroup(
-            *[e for k, e in edges.items() if k[0] == 1]
-        )
+        old_h1_out_edges = VGroup(*[e for k, e in edges.items() if k[0] == 1])
         self.play(FadeOut(old_h1_out_edges), run_time=0.3)
 
         h_sp_d = 1.6
@@ -141,19 +139,17 @@ class Slide02BasicNetwork(Slide):
         cy_dots = (h1_y_positions[0] + h1_y_positions[-1]) / 2
 
         # Create h₂ neurons (4, matching h₁'s vertical span)
-        h2_neurons = VGroup(*[
-            Neuron(label=f"h_{{2,{i}}}", color=C_HIDDEN)
-            for i in range(4)
-        ])
+        h2_neurons = VGroup(
+            *[Neuron(label=f"h_{{2,{i}}}", color=C_HIDDEN) for i in range(4)]
+        )
         for i, n in enumerate(h2_neurons):
             n.move_to(np.array([h2_x, h1_y_positions[i], 0]))
             n.set_z_index(1)
 
         # Create h₃ neurons (4, matching h₁'s vertical span)
-        h3_neurons = VGroup(*[
-            Neuron(label=f"h_{{3,{i}}}", color=C_HIDDEN)
-            for i in range(4)
-        ])
+        h3_neurons = VGroup(
+            *[Neuron(label=f"h_{{3,{i}}}", color=C_HIDDEN) for i in range(4)]
+        )
         for i, n in enumerate(h3_neurons):
             n.move_to(np.array([h3_x, h1_y_positions[i], 0]))
             n.set_z_index(1)
@@ -164,24 +160,46 @@ class Slide02BasicNetwork(Slide):
 
         # Edges: h₁ → h₂ (4×4 = 16)
         edges_h1_h2 = [
-            Line(s.get_center(), t.get_center(),
-                 stroke_color=C_ORANGE, stroke_width=0.8, stroke_opacity=0.2)
-            for s in h1 for t in h2_neurons
+            Line(
+                s.get_center(),
+                t.get_center(),
+                stroke_color=C_ORANGE,
+                stroke_width=0.8,
+                stroke_opacity=0.5,
+            )
+            for s in h1
+            for t in h2_neurons
         ]
         # Edges: h₂ → h₃ (4×4 = 16)
         edges_h2_h3 = [
-            Line(s.get_center(), t.get_center(),
-                 stroke_color=C_ORANGE, stroke_width=0.8, stroke_opacity=0.2)
-            for s in h2_neurons for t in h3_neurons
+            Line(
+                s.get_center(),
+                t.get_center(),
+                stroke_color=C_ORANGE,
+                stroke_width=0.8,
+                stroke_opacity=0.5,
+            )
+            for s in h2_neurons
+            for t in h3_neurons
         ]
         # Edges: h₃ → output (4×2 = 8)
         edges_h3_out = [
-            Line(s.get_center(), np.array([out_new_x, o_y0, 0]),
-                 stroke_color=C_ORANGE, stroke_width=0.8, stroke_opacity=0.2)
+            Line(
+                s.get_center(),
+                np.array([out_new_x, o_y0, 0]),
+                stroke_color=C_ORANGE,
+                stroke_width=0.8,
+                stroke_opacity=0.5,
+            )
             for s in h3_neurons
         ] + [
-            Line(s.get_center(), np.array([out_new_x, o_y1, 0]),
-                 stroke_color=C_ORANGE, stroke_width=0.8, stroke_opacity=0.2)
+            Line(
+                s.get_center(),
+                np.array([out_new_x, o_y1, 0]),
+                stroke_color=C_ORANGE,
+                stroke_width=0.8,
+                stroke_opacity=0.5,
+            )
             for s in h3_neurons
         ]
 
@@ -200,7 +218,9 @@ class Slide02BasicNetwork(Slide):
         # Bracket + label spanning h₁ through ⋯
         depth_brace = Brace(
             VGroup(*h1, *h2_neurons, *h3_neurons, dots),
-            DOWN, color=C_YELLOW, buff=0.15,
+            DOWN,
+            color=C_YELLOW,
+            buff=0.15,
         )
         depth_label = Text("many hidden layers", font_size=22, color=C_YELLOW)
         depth_label.next_to(depth_brace, DOWN, buff=0.1)
@@ -212,7 +232,11 @@ class Slide02BasicNetwork(Slide):
         # ══════════════════════════════════════════════════════════════════
 
         depth_extra = VGroup(
-            *h2_neurons, *h3_neurons, dots, depth_brace, depth_label,
+            *h2_neurons,
+            *h3_neurons,
+            dots,
+            depth_brace,
+            depth_label,
             *all_new_edges,
         )
         self.play(FadeOut(depth_extra), run_time=0.5)
@@ -225,9 +249,15 @@ class Slide02BasicNetwork(Slide):
         )
         # Recreate the old h₁→output edges
         restored_h1_out = [
-            Line(s.get_center(), t.get_center(),
-                 stroke_color=C_ORANGE, stroke_width=0.8, stroke_opacity=0.2)
-            for s in h1 for t in out
+            Line(
+                s.get_center(),
+                t.get_center(),
+                stroke_color=C_ORANGE,
+                stroke_width=0.8,
+                stroke_opacity=0.5,
+            )
+            for s in h1
+            for t in out
         ]
         # Store them back in edges dict so later code can refer to them
         for i, s in enumerate(h1):
@@ -303,30 +333,50 @@ class Slide02BasicNetwork(Slide):
         for s in all_inp:
             for t in h_extra:
                 new_in_hid_edges.append(
-                    Line(s.get_center(), t.get_center(),
-                         stroke_color=C_ORANGE, stroke_width=0.8, stroke_opacity=0.2)
+                    Line(
+                        s.get_center(),
+                        t.get_center(),
+                        stroke_color=C_ORANGE,
+                        stroke_width=0.8,
+                        stroke_opacity=0.5,
+                    )
                 )
         # Also edges from i_extra to existing hidden
         for s in i_extra:
             for t in hid:
                 new_in_hid_edges.append(
-                    Line(s.get_center(), t.get_center(),
-                         stroke_color=C_ORANGE, stroke_width=0.8, stroke_opacity=0.2)
+                    Line(
+                        s.get_center(),
+                        t.get_center(),
+                        stroke_color=C_ORANGE,
+                        stroke_width=0.8,
+                        stroke_opacity=0.5,
+                    )
                 )
 
         new_hid_out_edges = []
         for s in all_hid:
             for t in o_extra:
                 new_hid_out_edges.append(
-                    Line(s.get_center(), t.get_center(),
-                         stroke_color=C_ORANGE, stroke_width=0.8, stroke_opacity=0.2)
+                    Line(
+                        s.get_center(),
+                        t.get_center(),
+                        stroke_color=C_ORANGE,
+                        stroke_width=0.8,
+                        stroke_opacity=0.5,
+                    )
                 )
         # Also edges from h_extra to existing output
         for s in h_extra:
             for t in out:
                 new_hid_out_edges.append(
-                    Line(s.get_center(), t.get_center(),
-                         stroke_color=C_ORANGE, stroke_width=0.8, stroke_opacity=0.2)
+                    Line(
+                        s.get_center(),
+                        t.get_center(),
+                        stroke_color=C_ORANGE,
+                        stroke_width=0.8,
+                        stroke_opacity=0.5,
+                    )
                 )
 
         all_new_w = new_in_hid_edges + new_hid_out_edges
@@ -369,9 +419,7 @@ class Slide02BasicNetwork(Slide):
             n for layer in neurons for n in layer if n not in keep_neurons
         ]
         # Include the restored h₁→output edges we created
-        remove_edges = [
-            e for k, e in edges.items() if k not in keep_edge_keys
-        ]
+        remove_edges = [e for k, e in edges.items() if k not in keep_edge_keys]
 
         self.play(
             FadeOut(VGroup(*remove_neurons)),

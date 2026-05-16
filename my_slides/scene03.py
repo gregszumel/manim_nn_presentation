@@ -11,6 +11,7 @@ class Slide03SingleNeuron(Slide):
         title = section_title("how one neuron computes")
         neurons, edges, net_group = build_network([2, 1], h_spacing=3.0, v_spacing=1.2)
         neurons[-1][-1].set_stroke_color(C_HIDDEN)
+        neurons[-1][-1].set_label("h_{0}", color=C_HIDDEN)
         net_group.shift(LEFT * 2.0 + DOWN * 0.3)
         self.add(*[n for layer in neurons for n in layer], *edges.values())
         self.play(FadeIn(title), run_time=0.5)
@@ -42,13 +43,13 @@ class Slide03SingleNeuron(Slide):
         term1 = MathTex(r"0.5", r"\times", r"0.6", r"=", r"0.30", font_size=30)
         term1[0].set_color(C_INPUT)
         term1[2].set_color(C_ORANGE)
-        term1[4].set_color(C_YELLOW)
+        term1[4].set_color(C_HIDDEN)
         term1.move_to(RIGHT * 3.2 + UP * 1.5)
 
         term2 = MathTex(r"0.8", r"\times", r"(-0.3)", r"=", r"-0.24", font_size=30)
         term2[0].set_color(C_INPUT)
         term2[2].set_color(C_ORANGE)
-        term2[4].set_color(C_YELLOW)
+        term2[4].set_color(C_HIDDEN)
         term2.next_to(term1, DOWN, buff=0.4).align_to(term1, RIGHT)
 
         plus = MathTex(r"+", font_size=30).next_to(term2, LEFT, buff=0.25)
@@ -64,7 +65,7 @@ class Slide03SingleNeuron(Slide):
         )
 
         sum_eq = MathTex(r"h", r"=", r"0.06", font_size=30)
-        sum_eq[2].set_color(C_YELLOW)
+        sum_eq[2].set_color(C_HIDDEN)
         sum_eq.next_to(divider, DOWN, buff=0.2).align_to(term2, RIGHT)
 
         bias_eq = MathTex(r"h = 0.06 +", r"\ 0.1", font_size=26)
@@ -161,7 +162,8 @@ class Slide03SingleNeuron(Slide):
         self.play(FadeIn(act_group), run_time=0.6)
         self.next_slide()
 
-        # ── Transition: fade out computation, expand back to [3,4,2] ─────
+        # ── Transition: fade out computation, expand to [3,4] ────────────
+        # Ends matching scene04's starting layout exactly.
         self.play(
             FadeOut(
                 VGroup(
@@ -180,34 +182,47 @@ class Slide03SingleNeuron(Slide):
             run_time=0.4,
         )
 
-        # Build target [3,4,2] geometry (matches scene02's starting layout)
+        # Build target [3,4] geometry — same params as scene04
         full_neurons, full_edges, full_net = build_network(
-            [3, 4, 2], h_spacing=2.5, v_spacing=0.9
+            [3, 4], h_spacing=2.8, v_spacing=0.95, colors=[C_INPUT, C_HIDDEN]
         )
-        full_net.center().shift(DOWN * 0.3)
+        # Layer 1 gets prefix "o" by default (last layer); relabel to "h"
+        for i, n in enumerate(full_neurons[1]):
+            n.set_label(f"h_{{{i}}}", color=C_HIDDEN)
+        full_net.center().shift(LEFT * 2.5)
 
         t_n00 = full_neurons[0][0].get_center()
         t_n01 = full_neurons[0][1].get_center()
         t_n10 = full_neurons[1][0].get_center()
 
-        # Move the 3 kept neurons back to their positions in the full network
+        self.play(
+            edges[(0, 0, 0)].animate.set_stroke(color=C_ORANGE, width=0.8),
+            edges[(0, 1, 0)].animate.set_stroke(color=C_ORANGE, width=0.8),
+        )
+        neurons[0][0].set_label("i_0")
+        neurons[0][1].set_label("i_1")
+        neurons[1][0].set_label("h_0", color=C_HIDDEN)
+        # Move the 3 kept neurons to their new positions
         self.play(
             neurons[0][0].animate.move_to(t_n00),
             neurons[0][1].animate.move_to(t_n01),
-            neurons[1][0].animate.move_to(t_n10).set_stroke(color=C_HIDDEN),
+            neurons[1][0].animate.move_to(t_n10),
             edges[(0, 0, 0)].animate.put_start_and_end_on(t_n00, t_n10),
             edges[(0, 1, 0)].animate.put_start_and_end_on(t_n01, t_n10),
             run_time=0.7,
         )
 
-        # Fade in the removed neurons layer by layer
-        for layer in [[full_neurons[0][2]], full_neurons[1][1:], full_neurons[2][:]]:
-            self.play(
-                LaggedStart(*[FadeIn(n) for n in layer], lag_ratio=0.2),
-                run_time=0.5,
-            )
+        # Fade in the remaining neurons: third input + hidden neurons 1-3
+        self.play(
+            LaggedStart(
+                FadeIn(full_neurons[0][2]),
+                *[FadeIn(n) for n in full_neurons[1][1:]],
+                lag_ratio=0.15,
+            ),
+            run_time=0.5,
+        )
 
-        # Create the remaining edges (the two kept ones are already correct)
+        # Create the remaining edges (the two kept ones are already positioned)
         extra_edges = [
             e for k, e in full_edges.items() if k not in {(0, 0, 0), (0, 1, 0)}
         ]

@@ -1,4 +1,5 @@
 from manim import *
+import numpy as np
 from manim_slides import Slide
 
 
@@ -9,15 +10,13 @@ class Slide01Goals(Slide):
     def construct(self):
         self.next_slide()
 
-        title = Text(
-            "neural networks: the math that matters", font_size=40, slant=ITALIC
-        )
+        title = Text("neural networks: what even are they?", font_size=40, slant=ITALIC)
         title.to_edge(UP, buff=0.6)
         self.play(FadeIn(title, shift=UP * 0.1), run_time=0.8)
 
         underline = Line(
-            title.get_left() + DOWN * 0.15,
-            title.get_right() + DOWN * 0.15,
+            np.array([title.get_left()[0], title.get_bottom()[1] - 0.08, 0]),
+            np.array([title.get_right()[0], title.get_bottom()[1] - 0.08, 0]),
             stroke_color=WHITE,
             stroke_width=1,
             stroke_opacity=0.4,
@@ -26,10 +25,9 @@ class Slide01Goals(Slide):
         self.next_slide()
 
         goals = [
-            "neural networks are just math — we can reason about them",
-            "evaluations are critical for understanding model behavior",
-            "prompting / agent orchestration is pseudo-finetuning",
-            "ML summer series: zero to your own LLM in 12 weeks",
+            "- Provide intuitions about how neural networks work",
+            "- evaluations are critical for understanding how models might perform in the field",
+            "- prompting is pseudo-finetuning",
         ]
         goal_mobs = VGroup(*[Text(g, font_size=27) for g in goals])
         goal_mobs.arrange(DOWN, buff=0.5, aligned_edge=LEFT)
