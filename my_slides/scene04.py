@@ -16,7 +16,7 @@ class Slide04Equations(Slide):
         )
         self.next_slide()
 
-        title = section_title("writing it out")
+        title = section_title("writing it all out")
         self.play(FadeIn(title), run_time=0.5)
 
         self.next_slide()

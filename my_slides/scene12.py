@@ -39,7 +39,7 @@ class Slide12TrainingInAction(Slide):
             y_length=3.8,
             axis_config={"stroke_color": WHITE, "stroke_width": 1.5},
             tips=False,
-        ).shift(LEFT * 3.2 + DOWN * 0.3)
+        ).shift(LEFT * 2.7 + DOWN * 0.6)
         self.play(Create(ax), run_time=0.4)
 
         # Target curve

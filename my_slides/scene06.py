@@ -42,8 +42,7 @@ class Slide06TwoLayers(Slide):
         out_neuron = new_neurons[0]
         out_edges = VGroup(*new_edge_mobs)
 
-        new_title = section_title("still just linear...")
-        self.play(Transform(title, new_title), run_time=0.4)
+        self.play(FadeOut(title), run_time=0.4)
 
         # ── Equation: h = W₁ i ────────────────────────────────────────────
         eq_h = MathTex(r"\mathbf{h}", "=", r"\mathbf{W}_1", r"\mathbf{i}", font_size=34)

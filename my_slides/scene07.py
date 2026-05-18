@@ -32,7 +32,7 @@ class Slide07Activations(Slide):
             y_length=3.0,
             axis_config={"stroke_color": WHITE, "stroke_width": 1.5},
             tips=False,
-        ).shift(DOWN * 0.1)
+        ).next_to(bio, DOWN, buff=0.5)
 
         x_lbl = MathTex("z", font_size=24, color=C_GREY).next_to(
             axes.get_x_axis(), DOWN, buff=0.2
@@ -196,31 +196,38 @@ class Slide07Activations(Slide):
         # ═══════════════════════════════════════════════════════════════════
         # ── 6. Why σ blocks collapse ─────────────────────────────────────
         # ═══════════════════════════════════════════════════════════════════
-        explain = Text(
-            "σ is nonlinear — it cannot be moved past the matrix",
-            font_size=24,
-            color=C_YELLOW,
-        )
-        explain.next_to(eq_o, DOWN, buff=0.6, aligned_edge=LEFT)
+        # Two short lines instead of one wide one so the text fits the frame.
+        explain = VGroup(
+            Text("σ is nonlinear —", font_size=20, color=C_YELLOW),
+            Text("it cannot be moved past the matrix", font_size=20, color=C_YELLOW),
+        ).arrange(DOWN, buff=0.12)
+        explain.next_to(eq_o, DOWN, buff=0.5).set_x(eq_o.get_center()[0])
 
         attempt = MathTex(
-            r"\sigma(\mathbf{W}_1 \mathbf{i})",
-            r"\;\neq\;",
-            r"\mathbf{W}_1 \sigma(\mathbf{i})",
-            font_size=34,
+            r"\sigma(",  # 0
+            r"\mathbf{W}_1",  # 1
+            r"\mathbf{i})",  # 2
+            r"\;\neq\;",  # 3
+            r"\mathbf{W}_1 ",  # 4
+            r"\sigma(",  # 5
+            r"\mathbf{i}",  # 6
+            ")",  # 7
+            font_size=28,
         )
-        attempt[0].set_color(C_RED)
-        attempt[2].set_color(C_RED)
-        attempt.next_to(explain, DOWN, buff=0.3, aligned_edge=LEFT)
+        attempt[1].set_color(C_ORANGE)
+        attempt[2].set_color(C_INPUT)
+        attempt[4].set_color(C_ORANGE)
+        attempt[6].set_color(C_INPUT)
+        attempt.next_to(explain, DOWN, buff=0.3).set_x(eq_o.get_center()[0])
 
         self.play(FadeIn(explain, shift=UP * 0.1), run_time=0.5)
         self.play(FadeIn(attempt, shift=UP * 0.1), run_time=0.6)
         self.next_slide()
 
         distinct = Text(
-            "layers stay fundamentally distinct", font_size=22, color=C_GREEN
+            "layers stay fundamentally distinct", font_size=18, color=C_GREEN
         )
-        distinct.next_to(attempt, DOWN, buff=0.3, aligned_edge=LEFT)
+        distinct.next_to(attempt, DOWN, buff=0.3).set_x(eq_o.get_center()[0])
         self.play(FadeIn(distinct, shift=UP * 0.1), run_time=0.5)
         self.next_slide()
 
@@ -253,21 +260,26 @@ class Slide07Activations(Slide):
             DOWN, buff=0.15, aligned_edge=LEFT
         )
 
-        summary = VGroup(no_group, yes_group).arrange(RIGHT, buff=1.2)
-        summary.to_edge(DOWN, buff=0.6)
+        # Summary moves up into the space the explain/attempt/distinct
+        # text vacated (right of the network), stacked vertically rather
+        # than side-by-side so the punchline can take the bottom slot.
+        summary = VGroup(no_group, yes_group).arrange(
+            DOWN, buff=0.45, aligned_edge=LEFT
+        )
+        summary.next_to(net_group, RIGHT, buff=1.3).set_y(eq_o.get_center()[1] - 2.0)
 
         self.play(FadeIn(summary, shift=UP * 0.1), run_time=0.7)
         self.next_slide()
 
         # ── 8. Punchline ─────────────────────────────────────────────────
+        # Punchline drops to the bottom edge, freed up by the summary's move.
         punchline = Text(
             "non-linearities = representational power",
             font_size=28,
             color=C_YELLOW,
         )
-        punchline.next_to(summary, UP, buff=0.3)
+        punchline.to_edge(DOWN, buff=0.5)
         self.play(FadeIn(punchline, shift=UP * 0.1), run_time=0.5)
         self.next_slide()
 
         self.play(FadeOut(Group(*self.mobjects)))
-

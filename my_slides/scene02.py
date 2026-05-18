@@ -138,84 +138,113 @@ class Slide02BasicNetwork(Slide):
         out_new_x = h3_x + 2.0
         cy_dots = (h1_y_positions[0] + h1_y_positions[-1]) / 2
 
-        # Create h₂ neurons (4, matching h₁'s vertical span)
+        # Pre-compute the centering shift so the existing network can slide
+        # into its final centered layout *before* the new neurons appear.
+        depth_shift_x = -((h1_x + out_new_x) / 2)
+
+        # New layer positions (post-shift, so they land in the gap directly)
+        h2_x_f = h2_x + depth_shift_x
+        h3_x_f = h3_x + depth_shift_x
+        dots_x_f = dots_x + depth_shift_x
+        out_new_x_f = out_new_x + depth_shift_x
+
+        # Create h₂ neurons (pre-placed at final centered positions)
         h2_neurons = VGroup(
             *[Neuron(label=f"h_{{2,{i}}}", color=C_HIDDEN) for i in range(4)]
         )
         for i, n in enumerate(h2_neurons):
-            n.move_to(np.array([h2_x, h1_y_positions[i], 0]))
+            n.move_to(np.array([h2_x_f, h1_y_positions[i], 0]))
             n.set_z_index(1)
 
-        # Create h₃ neurons (4, matching h₁'s vertical span)
+        # Create h₃ neurons (pre-placed at final centered positions)
         h3_neurons = VGroup(
             *[Neuron(label=f"h_{{3,{i}}}", color=C_HIDDEN) for i in range(4)]
         )
         for i, n in enumerate(h3_neurons):
-            n.move_to(np.array([h3_x, h1_y_positions[i], 0]))
+            n.move_to(np.array([h3_x_f, h1_y_positions[i], 0]))
             n.set_z_index(1)
 
-        # Ellipsis
+        # Ellipsis (pre-placed)
         dots = MathTex(r"\cdots", font_size=36, color=C_GREY)
-        dots.move_to(np.array([dots_x, cy_dots, 0]))
+        dots.move_to(np.array([dots_x_f, cy_dots, 0]))
 
-        # Edges: h₁ → h₂ (4×4 = 16)
+        # h₁ ends up at h1_x + depth_shift_x after the slide-out animation
+        h1_pos_after = [
+            n.get_center() + np.array([depth_shift_x, 0, 0]) for n in h1
+        ]
+        out_new_pt_0 = np.array([out_new_x_f, o_y0, 0])
+        out_new_pt_1 = np.array([out_new_x_f, o_y1, 0])
+
+        # Edges constructed using FINAL positions so they connect cleanly
         edges_h1_h2 = [
             Line(
-                s.get_center(),
-                t.get_center(),
+                h1_pos_after[i_idx],
+                h2_neurons[t_idx].get_center(),
                 stroke_color=C_ORANGE,
                 stroke_width=0.8,
                 stroke_opacity=0.5,
             )
-            for s in h1
-            for t in h2_neurons
+            for i_idx in range(len(h1))
+            for t_idx in range(len(h2_neurons))
         ]
-        # Edges: h₂ → h₃ (4×4 = 16)
         edges_h2_h3 = [
             Line(
-                s.get_center(),
-                t.get_center(),
+                h2_neurons[i_idx].get_center(),
+                h3_neurons[t_idx].get_center(),
                 stroke_color=C_ORANGE,
                 stroke_width=0.8,
                 stroke_opacity=0.5,
             )
-            for s in h2_neurons
-            for t in h3_neurons
+            for i_idx in range(len(h2_neurons))
+            for t_idx in range(len(h3_neurons))
         ]
-        # Edges: h₃ → output (4×2 = 8)
         edges_h3_out = [
             Line(
-                s.get_center(),
-                np.array([out_new_x, o_y0, 0]),
+                h3_neurons[s].get_center(),
+                out_new_pt_0,
                 stroke_color=C_ORANGE,
                 stroke_width=0.8,
                 stroke_opacity=0.5,
             )
-            for s in h3_neurons
+            for s in range(len(h3_neurons))
         ] + [
             Line(
-                s.get_center(),
-                np.array([out_new_x, o_y1, 0]),
+                h3_neurons[s].get_center(),
+                out_new_pt_1,
                 stroke_color=C_ORANGE,
                 stroke_width=0.8,
                 stroke_opacity=0.5,
             )
-            for s in h3_neurons
+            for s in range(len(h3_neurons))
         ]
-
-        # Animate: move output right, fade in new layers + edges
         all_new_edges = edges_h1_h2 + edges_h2_h3 + edges_h3_out
+
+        # Step 1: slide the existing network into its final centered layout
+        # (left side shifts left, output moves right).  This OPENS UP the gap.
+        left_group = VGroup(
+            *neurons[0], *h1,
+            *[e for k, e in edges.items() if k[0] == 0],
+        )
         self.play(
-            out[0].animate.move_to(np.array([out_new_x, o_y0, 0])),
-            out[1].animate.move_to(np.array([out_new_x, o_y1, 0])),
+            left_group.animate.shift(RIGHT * depth_shift_x),
+            out[0].animate.move_to(out_new_pt_0),
+            out[1].animate.move_to(out_new_pt_1),
+            run_time=0.7,
+        )
+
+        # Step 2: populate the gap with the new layers + edges.
+        self.play(
             LaggedStart(*[FadeIn(n) for n in h2_neurons], lag_ratio=0.3),
             LaggedStart(*[FadeIn(n) for n in h3_neurons], lag_ratio=0.3),
             FadeIn(dots, scale=0.5),
             *[Create(e) for e in all_new_edges],
             run_time=1.0,
         )
+        # Alias kept so the existing scale-back code can undo the shift
+        depth_recenter_x = depth_shift_x
 
         # Bracket + label spanning h₁ through ⋯
+        # (the network is already in its centered position from Step 1)
         depth_brace = Brace(
             VGroup(*h1, *h2_neurons, *h3_neurons, dots),
             DOWN,
@@ -241,10 +270,17 @@ class Slide02BasicNetwork(Slide):
         )
         self.play(FadeOut(depth_extra), run_time=0.5)
 
-        # Restore output to original position
+        # Restore output to original position AND undo the recenter shift
+        # on the left side so input/hidden return to their starting spots.
+        left_group = VGroup(
+            *neurons[0],
+            *h1,
+            *[e for k, e in edges.items() if k[0] == 0],
+        )
         self.play(
             out[0].animate.move_to(o0_pos),
             out[1].animate.move_to(o1_pos),
+            left_group.animate.shift(RIGHT * -depth_recenter_x),
             run_time=0.4,
         )
         # Recreate the old h₁→output edges
@@ -398,6 +434,21 @@ class Slide02BasicNetwork(Slide):
             LaggedStart(*[Create(e) for e in all_new_w], lag_ratio=0.02),
             run_time=1.2,
         )
+
+        # Re-center vertically — width growth only added neurons below,
+        # so shift everything up to put the centroid back near y=-0.3.
+        width_visible = VGroup(
+            *all_inp,
+            *all_hid,
+            *all_out,
+            *all_new_w,
+            *[e for k, e in edges.items() if k[0] in (0, 1)],
+        )
+        width_recenter_y = -0.3 - width_visible.get_center()[1]
+        self.play(
+            width_visible.animate.shift(UP * width_recenter_y),
+            run_time=0.4,
+        )
         self.next_slide()
 
         # ══════════════════════════════════════════════════════════════════
@@ -405,7 +456,17 @@ class Slide02BasicNetwork(Slide):
         # ══════════════════════════════════════════════════════════════════
 
         w_extra = VGroup(*i_extra, *h_extra, *o_extra, *all_new_w)
-        self.play(FadeOut(w_extra), run_time=0.5)
+        originals_back = VGroup(
+            *neurons[0],
+            *neurons[1],
+            *neurons[2],
+            *[e for k, e in edges.items() if k[0] in (0, 1)],
+        )
+        self.play(
+            FadeOut(w_extra),
+            originals_back.animate.shift(UP * -width_recenter_y),
+            run_time=0.5,
+        )
         self.next_slide()
 
         # ══════════════════════════════════════════════════════════════════

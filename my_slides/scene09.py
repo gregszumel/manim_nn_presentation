@@ -133,7 +133,7 @@ class Slide09UniversalApprox(Slide):
                 y_length=4.5,
                 axis_config={"stroke_width": 1.2, "stroke_color": C_GREY},
                 tips=False,
-            ).shift(LEFT * 3.0 + DOWN * 0.2)
+            ).shift(LEFT * 2.6 + DOWN * 0.5)
             fn_lbl = Text(name, font_size=26, color=color).next_to(ax, UP, buff=0.1)
 
             if not is_rand:
@@ -165,7 +165,7 @@ class Slide09UniversalApprox(Slide):
                 v_spacing=0.78,
                 labels=False,  # dynamic labels replace static ones
             )
-            net_mob.shift(RIGHT * 3.8 + DOWN * 0.1)
+            net_mob.shift(RIGHT * 3.2 + DOWN * 0.4)
 
             for e in edges.values():
                 e.set_stroke(opacity=0.55, width=1.1)

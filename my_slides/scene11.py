@@ -42,7 +42,7 @@ B2_INIT = float(_rng.normal(0, 0.3))
 
 
 # ── Helpers for building the NN diagram with live weights ─────────
-def build_training_view(scene, ax_shift_left=3.2, net_shift_right=3.2):
+def build_training_view(scene, ax_shift_left=2.7, net_shift_right=2.6):
     """
     Build the [1, N_HIDDEN, 1] diagram with live-updating W2 edge labels
     and a live b2 label.  Returns (trackers, neurons, edges, net_mob,
@@ -68,7 +68,7 @@ def build_training_view(scene, ax_shift_left=3.2, net_shift_right=3.2):
         v_spacing=0.55,
         labels=False,
     )
-    net_mob.shift(RIGHT * net_shift_right + DOWN * 0.3)
+    net_mob.shift(RIGHT * net_shift_right + DOWN * 0.6)
 
     for e in edges.values():
         e.set_stroke(opacity=0.45, width=1.0)
@@ -152,7 +152,7 @@ def build_training_view(scene, ax_shift_left=3.2, net_shift_right=3.2):
         0.0,
         num_decimal_places=2,
         include_sign=True,
-        font_size=28,
+        font_size=22,
         color=C_INPUT,
     )
     input_lbl.move_to(input_center).set_z_index(12)
@@ -191,7 +191,7 @@ def build_training_view(scene, ax_shift_left=3.2, net_shift_right=3.2):
         current_forward(x_tracker.get_value()),
         num_decimal_places=2,
         include_sign=True,
-        font_size=28,
+        font_size=22,
         color=C_YELLOW,
     )
     output_lbl.move_to(output_center).set_z_index(12)
@@ -335,7 +335,7 @@ class Slide11Training(Slide):
     def construct(self):
         self.next_slide()
 
-        title = section_title("how do we train?")
+        title = section_title("how do we find the weights?")
         self.play(FadeIn(title), run_time=0.5)
 
         # ── Axes (left) ────────────────────────────────────────────
@@ -346,7 +346,7 @@ class Slide11Training(Slide):
             y_length=3.8,
             axis_config={"stroke_color": WHITE, "stroke_width": 1.5},
             tips=False,
-        ).shift(LEFT * 3.2 + DOWN * 0.3)
+        ).shift(LEFT * 2.7 + DOWN * 0.6)
         self.play(Create(ax), run_time=0.5)
 
         # ── Target ─────────────────────────────────────────────────

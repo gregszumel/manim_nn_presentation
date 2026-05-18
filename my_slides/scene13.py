@@ -226,12 +226,24 @@ class Slide13RandomFunction(Slide):
         self.next_slide()
 
         # ── Punchline ─────────────────────────────────────────────
-        caption = Text(
+        # Floats in the middle of the chart with a dark backing card so
+        # it reads clearly against the curves and dots behind it.
+        caption_text = Text(
             "the network only learned the function on the training domain",
             font_size=22,
             color=C_ORANGE,
         )
-        caption.to_edge(DOWN, buff=0.4)
+        caption_bg = SurroundingRectangle(
+            caption_text,
+            color=C_ORANGE,
+            buff=0.22,
+            fill_color=DARK_BG,
+            fill_opacity=0.92,
+            corner_radius=0.12,
+            stroke_width=1.5,
+        )
+        caption = VGroup(caption_bg, caption_text)
+        caption.move_to(ax_wide.c2p(0, 7.5)).set_z_index(20)
         self.play(FadeIn(caption, shift=UP * 0.1), run_time=0.6)
         self.next_slide()
 
@@ -304,13 +316,13 @@ class Slide13RandomFunction(Slide):
             _cat("assets/cat4.jpeg", -0.10),
         ]
         not_cat_specs = [
-            _cat("assets/dog.jpg", -1.85),  # top-left
-            _cat("assets/goat.jpg", -1.50),  # top-left
-            _cat("assets/hawk.jpg", 1.50),  # top-right
-            _cat("assets/bison.jpeg", 1.85),  # top-right
+            _cat("assets/goat.jpg", -1.85),  # swapped with dog
+            _cat("assets/dog.jpg", -1.50),  # swapped with goat
+            _cat("assets/bison.jpeg", 1.50),  # swapped with hawk
+            _cat("assets/hawk.jpg", 1.85),  # swapped with bison
         ]
 
-        def _make_img(path, x, y, h=0.55):
+        def _make_img(path, x, y, h=0.75):
             img = ImageMobject(path)
             img.height = h
             img.move_to(ax_zoom.c2p(x, y))
@@ -363,7 +375,10 @@ class Slide13RandomFunction(Slide):
             x_range=[-1.95, 1.95],
             color=C_GREEN,
             stroke_width=2.5,
-        ).set_opacity(0.55)
+        )
+        # set_opacity() would set fill_opacity too (and color= seeded the
+        # fill green), so use set_stroke() to dim only the stroke.
+        true_curve.set_stroke(opacity=0.55).set_fill(opacity=0)
         true_curve_lbl = Text("true 'catness' (unknown)", font_size=16, color=C_GREEN)
         true_curve_lbl.next_to(ax_zoom, UP, buff=0.1).shift(LEFT * 2.0)
         self.play(
@@ -399,7 +414,7 @@ class Slide13RandomFunction(Slide):
         orange_x = 0.9
         orange_y = true_fn(orange_x)
         orange_img = ImageMobject("assets/orange cat.jpeg")
-        orange_img.height = 0.55
+        orange_img.height = 0.75
         orange_img.move_to(ax_zoom.c2p(orange_x, orange_y))
         orange_img.set_z_index(6)
         self.play(FadeIn(orange_img, scale=0.8), run_time=0.6)
@@ -470,7 +485,7 @@ class Slide13RandomFunction(Slide):
         self.play(
             *[FadeOut(m) for m in chart_mobs],
             FadeOut(title),
-            orange_img.animate.scale(1.5).move_to(LEFT * 5.0 + UP * 2.5),
+            orange_img.animate.scale(2.4).move_to(LEFT * 4.7 + UP * 2.3),
             run_time=1.0,
         )
 
@@ -513,14 +528,14 @@ class Slide13RandomFunction(Slide):
 
         # ── Three beats ───────────────────────────────────────────
         beats = [
-            "- iterating a prompt on examples ≈ training a model (about 1000 examples!)",
-            "- every prompt has an 'orange cat' — a case you didn't see that will break your approach",
+            "- prompting on a few examples is like training on as many",
+            "- they can therefore also have 'orange cats' - out of domain examples",
             "- keep a holdout set you never tune against, you only evaluate on",
-            "- as soon as you evaluate on hold-out set enough, it has become your training set",
+            "- as soon as you evaluate on hold-out set enough, it \nhas become your training set",
         ]
         beat_mobs = VGroup(*[Text(b, font_size=26, color=C_GREEN) for b in beats])
         beat_mobs.arrange(DOWN, buff=0.55, aligned_edge=LEFT)
-        beat_mobs.move_to(RIGHT * 0.5 + DOWN * 0.2)
+        beat_mobs.move_to(RIGHT * 0.5 + DOWN * 0.7)
         for m in beat_mobs:
             m.set_opacity(0)
         self.add(beat_mobs)
@@ -594,8 +609,8 @@ class Slide13RandomFunction(Slide):
             FadeOut(recap_mobs),
             FadeOut(cta),
             FadeIn(thanks, scale=0.9),
-            FadeIn(final_cat, shift=RIGHT * 0.2),
-            FadeIn(final_orange, shift=LEFT * 0.2),
+            # FadeIn(final_cat, shift=RIGHT * 0.2),
+            # FadeIn(final_orange, shift=LEFT * 0.2),
             run_time=0.9,
         )
         self.next_slide()

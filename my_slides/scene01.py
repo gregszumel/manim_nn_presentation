@@ -26,8 +26,8 @@ class Slide01Goals(Slide):
 
         goals = [
             "- Provide intuitions about how neural networks work",
-            "- evaluations are critical for understanding how models might perform in the field",
-            "- prompting is pseudo-finetuning",
+            "- evaluations are essential when developing ML models",
+            "- prompting is pseudo-finetuning, so the above point applies",
         ]
         goal_mobs = VGroup(*[Text(g, font_size=27) for g in goals])
         goal_mobs.arrange(DOWN, buff=0.5, aligned_edge=LEFT)

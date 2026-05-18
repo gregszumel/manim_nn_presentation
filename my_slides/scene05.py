@@ -96,7 +96,7 @@ class Slide05MatrixMult(Slide):
         eq_op = MathTex(r"=", font_size=32)
 
         mat_eq = VGroup(W_mat, dot_op, i_vec, eq_op, h_vec).arrange(RIGHT, buff=0.45)
-        mat_eq.center().shift(DOWN * 1.0)
+        mat_eq.center().shift(DOWN * 0.5)
 
         # Record target positions BEFORE hiding anything
         W_pos = {
@@ -290,7 +290,7 @@ class Slide05MatrixMult(Slide):
             MathTex(r"\mathbf{i}", font_size=48, color=C_INPUT),
         )
         eq_final.arrange(RIGHT, buff=0.12)
-        eq_final.next_to(mat_eq, DOWN, buff=1.0)
+        eq_final.next_to(mat_eq, DOWN, buff=0.55)
 
         # Move the grown symbols to their equation positions + reveal =
         self.play(
