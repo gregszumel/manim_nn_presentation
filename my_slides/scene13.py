@@ -33,6 +33,21 @@ def trained_forward(x):
     return forward(x, W2_FINAL, B2_FINAL)
 
 
+def fill_between(ax, f1, f2, x_range, color, opacity=0.30):
+    """Polygon filling the area between two curves over x_range."""
+    xs = np.linspace(x_range[0], x_range[1], 220)
+    top = [ax.c2p(float(x), float(f1(x))) for x in xs]
+    bot = [ax.c2p(float(x), float(f2(x))) for x in reversed(xs)]
+    return Polygon(
+        *top,
+        *bot,
+        color=color,
+        fill_color=color,
+        fill_opacity=opacity,
+        stroke_width=0,
+    ).set_z_index(-1)
+
+
 # ══════════════════════════════════════════════════════════════════
 # Slide 13 — Zoom out: training vs. validation vs. test
 # ══════════════════════════════════════════════════════════════════
@@ -121,6 +136,28 @@ class Slide13RandomFunction(Slide):
         )
         self.next_slide()
 
+        # ── Fill the gap with red: "look at that error" ───────────
+        err_fill = fill_between(
+            ax_wide,
+            true_fn,
+            trained_forward,
+            x_range=[-4.8, 4.8],
+            color=C_RED,
+            opacity=0.32,
+        )
+        err_caption = Text(
+            "the error is huge outside the training domain",
+            font_size=22,
+            color=C_RED,
+        )
+        err_caption.to_edge(DOWN, buff=0.4)
+        self.play(
+            FadeIn(err_fill),
+            FadeIn(err_caption, shift=UP * 0.1),
+            run_time=0.8,
+        )
+        self.next_slide()
+
         # ── Red circle around training domain ─────────────────────
         # Use an Ellipse sized in screen space so it cleanly encloses
         # the training points (which lie on the target curve in [-1.6, 1.6]).
@@ -144,6 +181,8 @@ class Slide13RandomFunction(Slide):
         train_label.next_to(train_circle, DOWN, buff=0.15)
 
         self.play(
+            FadeOut(err_fill),
+            FadeOut(err_caption),
             Create(train_circle),
             FadeIn(train_label, shift=UP * 0.1),
             run_time=0.8,
@@ -408,7 +447,7 @@ class Slide13RandomFunction(Slide):
         self.next_slide()
 
         # ══════════════════════════════════════════════════════════
-        # EPILOGUE — call to action: this is how prompting works too
+        # WHISPER — a real-world example of the same idea
         # ══════════════════════════════════════════════════════════
         # Sweep the chart, keep the orange cat as the metaphor anchor.
         chart_mobs = [
@@ -435,6 +474,39 @@ class Slide13RandomFunction(Slide):
             run_time=1.0,
         )
 
+        whisper_title = section_title("this happened with Whisper")
+        self.play(FadeIn(whisper_title), run_time=0.6)
+        self.next_slide()
+
+        whisper_beats = [
+            ("- we fine-tuned Whisper on English-only audio", C_CLAIM),
+            ("- it got better at English ✓", C_GREEN),
+            ("- but it lost its ability to detect other languages ✗", C_RED),
+            ("- the orange cat was Spanish", C_ORANGE),
+        ]
+        whisper_mobs = VGroup(
+            *[Text(b, font_size=26, color=c) for (b, c) in whisper_beats]
+        )
+        whisper_mobs.arrange(DOWN, buff=0.55, aligned_edge=LEFT)
+        whisper_mobs.move_to(RIGHT * 0.5 + DOWN * 0.2)
+        for m in whisper_mobs:
+            m.set_opacity(0)
+        self.add(whisper_mobs)
+
+        for m in whisper_mobs:
+            self.play(m.animate.set_opacity(1.0), run_time=0.5)
+            self.next_slide()
+
+        # ── Transition to the prompts epilogue ────────────────────
+        self.play(
+            FadeOut(whisper_mobs),
+            FadeOut(whisper_title),
+            run_time=0.5,
+        )
+
+        # ══════════════════════════════════════════════════════════
+        # EPILOGUE — call to action: this is how prompting works too
+        # ══════════════════════════════════════════════════════════
         epilogue_title = section_title("the same thing happens with prompts")
         self.play(FadeIn(epilogue_title), run_time=0.6)
         self.next_slide()
@@ -506,11 +578,24 @@ class Slide13RandomFunction(Slide):
 
         thanks = Text("thank you!", font_size=44, slant=ITALIC, color=C_ORANGE)
         thanks.move_to(ORIGIN)
+
+        # Flank the thanks with the two cats from the story:
+        # the personal cat (training) and the orange cat (out-of-domain).
+        final_cat = ImageMobject("assets/cat1.jpeg")
+        final_cat.height = 1.6
+        final_cat.next_to(thanks, LEFT, buff=1.0)
+
+        final_orange = ImageMobject("assets/orange cat.jpeg")
+        final_orange.height = 1.6
+        final_orange.next_to(thanks, RIGHT, buff=1.0)
+
         self.play(
             FadeOut(recap_title),
             FadeOut(recap_mobs),
             FadeOut(cta),
             FadeIn(thanks, scale=0.9),
+            FadeIn(final_cat, shift=RIGHT * 0.2),
+            FadeIn(final_orange, shift=LEFT * 0.2),
             run_time=0.9,
         )
         self.next_slide()

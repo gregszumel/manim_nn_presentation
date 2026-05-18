@@ -14,15 +14,15 @@ from manim_slides import Slide
 import numpy as np
 
 # ── Palette ────────────────────────────────────────────────────────
+C_RED = "#FF6B6B"
 C_INPUT = "#5B9BD5"
 C_HIDDEN = "#70AD47"
-C_OUTPUT = "#ED7D31"
+C_OUTPUT = C_RED
 C_EDGE = "#888888"
 DARK_BG = "#1a1a2e"
 C_YELLOW = "#FFD966"
 C_ORANGE = "#FF8C42"
 C_GREEN = "#69db7c"
-C_RED = "#FF6B6B"
 C_GREY = "#AAAAAA"
 C_CLAIM = "#A8C4E0"
 

@@ -48,7 +48,7 @@ class Slide06TwoLayers(Slide):
         # ── Equation: h = W₁ i ────────────────────────────────────────────
         eq_h = MathTex(r"\mathbf{h}", "=", r"\mathbf{W}_1", r"\mathbf{i}", font_size=34)
         eq_h[0].set_color(C_HIDDEN)
-        eq_h[2].set_color(C_HIDDEN)  # W1 in hidden (green)
+        eq_h[2].set_color(C_ORANGE)  # W1 in hidden (green)
         eq_h[3].set_color(C_INPUT)
         eq_h.next_to(net_group, RIGHT, buff=1.8).shift(UP * 1.0)
 
@@ -96,7 +96,7 @@ class Slide06TwoLayers(Slide):
             r"\mathbf{h}", "=", r"\mathbf{W}_1", r"\mathbf{i}", font_size=34
         )
         eq_h1[0].set_color(C_HIDDEN)
-        eq_h1[2].set_color(C_HIDDEN)  # W1 green
+        eq_h1[2].set_color(C_ORANGE)
         eq_h1[3].set_color(C_INPUT)
         eq_h1.next_to(eq_o, UP, buff=0.5, aligned_edge=LEFT)
 
@@ -249,7 +249,7 @@ class Slide06TwoLayers(Slide):
         # ── Build W₂ (1 × 4), W₁ (4 × 3), W* (1 × 3) ────────────────────
         w2_grid = [
             [
-                MathTex(f"w_{{{j}}}", font_size=20, color=C_OUTPUT)
+                MathTex(f"w_{{{j}}}", font_size=20, color=C_ORANGE)
                 for j in range(n_hidden)
             ]
         ]
@@ -257,7 +257,7 @@ class Slide06TwoLayers(Slide):
 
         w1_grid = [
             [
-                MathTex(f"w_{{{x}{j}}}", font_size=20, color=C_HIDDEN)
+                MathTex(f"w_{{{x}{j}}}", font_size=20, color=C_ORANGE)
                 for x in range(n_inputs)
             ]
             for j in range(n_hidden)
@@ -320,8 +320,8 @@ class Slide06TwoLayers(Slide):
                 FadeOut(w2_row_hl),
                 FadeOut(w1_col_hl),
                 w_star_grid[0][x].animate.set_color(C_YELLOW),
-                *[w2_grid[0][jj].animate.set_color(C_OUTPUT) for jj in range(n_hidden)],
-                *[w1_grid[j][x].animate.set_color(C_HIDDEN) for j in range(n_hidden)],
+                *[w2_grid[0][jj].animate.set_color(C_ORANGE) for jj in range(n_hidden)],
+                *[w1_grid[j][x].animate.set_color(C_ORANGE) for j in range(n_hidden)],
                 run_time=0.3,
             )
 
@@ -335,8 +335,8 @@ class Slide06TwoLayers(Slide):
             r"\mathbf{W}^*",
             font_size=34,
         )
-        eq_final[0].set_color(C_OUTPUT)
-        eq_final[1].set_color(C_HIDDEN)
+        eq_final[0].set_color(C_ORANGE)
+        eq_final[1].set_color(C_ORANGE)
         eq_final[3].set_color(C_YELLOW)
         eq_final.to_corner(DR, buff=1.5)
 
