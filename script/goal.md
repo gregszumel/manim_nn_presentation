@@ -1,4 +1,3 @@
-
 ## Intro slide
 
 In this L&L I'd like to get across a few things:
@@ -30,6 +29,28 @@ In fact, neural networks are called universal function approximators -- meaning 
 What's crazy, is that this means we can approximate any function (show a handful of functions, their approximations, and weights: linear, exponential, quadratics, and random outputs).
 
 There's no need for us to stick to stick to the 2d classification / regression problems! These functions are universal after all - we can represent anything. Images (cat detector), and audio are both also fundamentally just numbers. Neural networks can approximate some function (and there is some function out there) that maps these collection of pixel values to whether or not there's a cat! This audio to whether or not there is speech. In the language models case, there's some function that can take in an entire mystery novel before the last word, and can accurately predict the next word from: "And the killer was ...". it's kind of mind bending to think about, but these are all just functions, albeit insanely complicated, but these are functions! Neural networks can approximate them.
+
+## Gradient Descent & Loss Landscape (side-by-side layout)
+
+The network stays visible on the *left* while the 3D landscape is on the *right* — so the audience sees weights update and loss change simultaneously.
+
+**Left half — Neural network + info:**
+- [2,1] network with weight labels on edges (w₀₀, w₁₀)
+- "goal: minimize loss" / "gradient descent: follow slope downhill"
+- Example A & B: inputs, outputs, individual losses
+- Total loss: ℒ = 0.25
+- Derivative formula: ∂ℒ/∂w₀₀ = -2(0.6 - w₀₀)
+- "compute slope → step opposite → repeat"
+
+**Right half — 3D Loss landscape:**
+- Smaller ThreeDAxes + checkerboard paraboloid surface
+- Dot + stem at current (w₀₀, w₁₀, loss) position
+
+**Gradient descent loop (4 steps):**
+On each step, *all three* update in sync:
+1. Weight labels on network edges change (w₀₀, w₁₀)
+2. Total loss value changes (ℒ)
+3. Dot moves on the 3D landscape (rolls downhill)
 
 ## Backprop
 
@@ -70,7 +91,3 @@ I hope that convinces you that prompt an LLM is similar to finetuning it, albeit
 
 
 Thanks! If this was interesting to you and you want to know more than just hand-wavey explanations, please think about our summer series!
-
-
-
-

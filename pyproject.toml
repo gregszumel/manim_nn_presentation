@@ -1,0 +1,18 @@
+[project]
+name = "manim-neural-networks"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "black>=26.3.1",
+    "manim>=0.20.1",
+    "manim-slides>=5.6.0",
+    "pyqt6>=6.11.0",
+    "torch>=2.11.0",
+]
+
+[tool.uv.workspace]
+members = [
+    "scripts",
+]
